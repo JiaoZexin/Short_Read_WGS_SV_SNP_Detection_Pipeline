@@ -1,0 +1,15 @@
+name: plink1.9
+channels:
+  - bioconda
+  - r
+  - defaults
+  - conda-forge
+dependencies:
+  - _libgcc_mutex=0.1
+  - _openmp_mutex=4.5
+  - gcta=1.93.2beta
+  - libgcc-ng=12.2.0
+  - llvm-openmp=14.0.6
+  - plink=1.90b6.21
+  - zlib=1.2.13
+prefix: /home/s2250706/anaconda3/envs/plink1.9

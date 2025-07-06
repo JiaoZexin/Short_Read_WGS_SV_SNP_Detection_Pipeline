@@ -1,0 +1,36 @@
+name: dellyv126
+channels:
+  - bioconda
+  - r
+  - defaults
+  - conda-forge
+dependencies:
+  - _libgcc_mutex=0.1
+  - _openmp_mutex=5.1
+  - boost-cpp=1.78.0
+  - bzip2=1.0.8
+  - c-ares=1.19.1
+  - ca-certificates=2025.2.25
+  - delly=1.2.6
+  - htslib=1.21
+  - icu=70.1
+  - krb5=1.20.1
+  - libcurl=8.12.1
+  - libdeflate=1.22
+  - libedit=3.1.20230828
+  - libev=4.33
+  - libgcc=15.1.0
+  - libgcc-ng=15.1.0
+  - libgomp=15.1.0
+  - libnghttp2=1.57.0
+  - libssh2=1.11.1
+  - libstdcxx=15.1.0
+  - libstdcxx-ng=11.2.0
+  - libzlib=1.2.13
+  - lz4-c=1.9.4
+  - ncurses=6.4
+  - openssl=3.5.1
+  - xz=5.6.4
+  - zlib=1.2.13
+  - zstd=1.5.6
+prefix: /home/s2250706/anaconda3/envs/dellyv126
