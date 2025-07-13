@@ -1,5 +1,5 @@
 process SV_merge_smoove {
-    tag { smoove_merge }
+    tag "smoove_merge"
     label 'highmem'
     conda 'envs/smoove.yml'
     publishDir "./Results/", mode: 'copy'
