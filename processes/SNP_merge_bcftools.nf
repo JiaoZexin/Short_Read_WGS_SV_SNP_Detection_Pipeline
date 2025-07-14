@@ -8,11 +8,11 @@ process SNP_merge_bcftools {
     path vcfs
 
     output:
-    path "10.snp/snp.all.vcf", emit: merged_vcf
+    path "10.bcftools_final.snp/snp.all.vcf", emit: merged_vcf
 
     script:
     """
-    mkdir -p 10.snp
+    mkdir -p 10.bcftools_final.snp
 
     # bgzip and index all input vcfs
     for vcf in ${vcfs}; do
@@ -26,6 +26,6 @@ process SNP_merge_bcftools {
       gz_vcfs="\$gz_vcfs \$vcf.gz"
     done
 
-    bcftools merge --force-samples -m id -O v -o 10.snp/snp.all.vcf \$gz_vcfs
+    bcftools merge --force-samples -m id -O v -o 10.bcftools_final.snp/snp.all.vcf \$gz_vcfs
     """
 }

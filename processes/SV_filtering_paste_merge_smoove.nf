@@ -12,6 +12,7 @@ process SV_filtering_paste_merge_smoove {
 
     script:
     """
+    mkdir -p 8.duphold
     cd 8.duphold
     merge_name=\$(date +"%Y%m%d_%H%M")
     start_time=\$(date +%s)

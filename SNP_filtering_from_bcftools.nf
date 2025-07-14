@@ -8,7 +8,7 @@ include { SNP_filtering_bcftools } from './processes/SNP_filtering_bcftools.nf'
 
 workflow {
 
-    snp_merge_input_ch = Channel.fromPath("10.snp/*.snp.vcf").collect()
+    snp_merge_input_ch = Channel.fromPath("${baseDir}/Results/7.bcftools/*/*.vcf").collect()
     merged_vcf_ch = SNP_merge_bcftools(snp_merge_input_ch).merged_vcf
     SNP_filtering_bcftools(merged_vcf_ch)
 
