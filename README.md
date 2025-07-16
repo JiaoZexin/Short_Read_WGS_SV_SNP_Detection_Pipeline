@@ -1,81 +1,170 @@
-# SV & SNP Analysis Pipeline using Nextflow
-
-This pipeline is implemented in Nextflow and modularized to support structural variation (SV), SNP detection, filtering, annotation, and GWAS analysis. It is suitable for large-scale genome studies in aquaculture species and other organisms.
+Here is a complete and professional README draft tailored for your GitHub repository:
 
 ---
 
-## 📁 Directory Structure
+# Short-Read WGS SV/SNP Detection and Analysis Pipeline
 
-```
-.
-├── main.nf                  # Main workflow
-├── nextflow.config          # Nextflow configuration
-├── channels.nf              # Channel definitions
-├── processes/               # All modular processes
-│   ├── alignment.nf
-│   ├── build_index.nf
-│   ├── call_smoove.nf
-│   ├── duphold_filter.nf
-│   ├── extract_samples.nf
-│   ├── final_filter.nf
-│   ├── fimpute_imputation.nf
-│   ├── genotyping.nf
-│   ├── go_kegg_annotation.nf
-│   ├── gwas_analysis.nf
-│   ├── init_setup.nf
-│   ├── merge_smoove_vcfs.nf
-│   ├── sam_to_bam.nf
-│   ├── snp_call.nf
-│   ├── snp_merge_filter.nf
-│   ├── snpeff_annotate.nf
-│   ├── sort_index_bam.nf
-│   ├── sv_count_summary.nf
-│   ├── sv_paste_merge.nf
-└── README.md
-└── script
-```
+This repository hosts the **Short-Read Whole Genome Sequencing (WGS) SV/SNP Detection Pipeline**, a modular, scalable, and reproducible workflow designed for structural variation (SV) and single nucleotide polymorphism (SNP) detection, filtering, genotyping, annotation, imputation, and downstream analyses including GWAS and enrichment studies. This pipeline is especially optimized for large-scale aquaculture genome projects but is adaptable to other species and research contexts.
+
 
 ---
 
-## Module Functions
+## 📌 Key Features
 
-| Step | Module | Function |
-|------|--------|----------|
-| 0    | `init_setup` | Create folder structure and remind user to prepare input files |
-| 1    | `build_index` | Index the reference genome using BWA and Samtools |
-| 2    | `extract_samples` | Extract sample IDs automatically |
-| 3    | `align_bwa` | Align reads to reference genome using BWA MEM |
-| 4    | `sam_to_bam` + `sort_index_bam` | Convert SAM to BAM, sort, and index |
-| 5    | `call_smoove` | Call SVs using smoove |
-| 6    | `merge_smoove_vcfs` | Merge VCFs from all samples |
-| 7    | `genotype_smoove` | Genotype merged SVs per sample |
-| 8    | `duphold_filter` | Filter SVs by DHFFC and SVTYPE |
-| 9    | `sv_count_summary` | Count SV types per sample |
-| 10   | `sv_paste_merge` | Merge SVs with smoove paste |
-| 11   | `final_filter` | Multi-step filtering: scaffold, BND, gap, depth, GT etc. |
-| 12   | `snp_call` + `snp_merge_filter` | SNP calling, merging, filtering |
-| 13   | `snpeff_annotate` | Annotate SVs and SNPs using snpEff |
-| 14   | `go_kegg_annotation` | Build GO/KEGG annotation DB using eggNOG & GO obo |
-| 15   | `fimpute_imputation` | Impute missing genotypes using FImpute3 |
-| 16   | `gwas_analysis` | Perform GWAS using Plink and GCTA64 |
+* **End-to-End Analysis**: From raw short-read WGS data to high-confidence SVs, SNPs, annotations, imputation, and GWAS.
+* **Highly Modular Design**: Composed of 5 core Nextflow modules and multiple sub-modules.
+* **Reproducibility and Scalability**: Implemented using **Nextflow DSL2 (v25.04.6)** with **Conda (v4.12.0)** and **Docker (v26.1.3)** for environment and dependency management.
+* **Multi-Caller Support**: Enables SV calling via **Lumpy (Smoove framework)**, **Delly**, **CNVpytor**; SNP calling via **Bcftools**, **Freebayes**, **DeepVariant**.
+* **Optional Functional Analysis**: Includes visualization, annotation, feature overlap, KEGG/GO enrichment, and GWAS.
+* **Parallel Processing & HPC-Friendly**: Supports SLURM, Docker, Conda, and local environments.
 
 ---
 
-## How to Run
+## 🗂 Pipeline Modules
+
+| Module                                      | Purpose                                                                      |
+| ------------------------------------------- | ---------------------------------------------------------------------------- |
+| **Main.nf**                                 | Core WGS data preparation, alignment, SV/SNP calling                         |
+| **SV\_genotyping\_smoove.nf**               | SV genotyping using Smoove and SVtyper                                       |
+| **SV\_bioinformatic\_filtering\_smoove.nf** | Multi-step filtering of SVs to reduce false positives                        |
+| **SNP\_filtering\_from\_bcftools.nf**       | SNP merging and quality filtering (Bcftools outputs)                         |
+| **Optional.nf**                             | Downstream analyses: visualization, annotation, GWAS, imputation, enrichment |
+
+---
+
+## 🔍 Pipeline Overview
+
+![Pipeline Diagram](./docs/figure2.2.png)
+
+**Figure:** Workflow structure detailing each module's role. Core modules (green), optional analyses (brown), inputs (blue), and outputs (red) are visualized.
+
+---
+
+## 🚀 Quick Start
+
+### Requirements
+
+* Nextflow >=25.04.6
+* Conda >=4.12.0 or Docker >=26.1.3
+* (Optional) SLURM for HPC environments
+
+### Clone Repository
 
 ```bash
-nextflow run main.nf
+git clone https://github.com/JiaoZexin/Short_Read_WGS_SV_SNP_Detection_Pipeline.git
+cd Short_Read_WGS_SV_SNP_Detection_Pipeline
 ```
 
-You can modify `nextflow.config` to customize resource usage, parameters, or profiles.
+### Basic Test Run Example
+
+```bash
+nextflow run main.nf -profile conda 
+```
+
+For a full test including all modules:
+
+```bash
+nextflow run main.nf -profile conda \
+  --use_delly=true \
+  --use_cnvpytor=true \
+  --use_bcftools=true \
+  --use_deepvariant=true \
+  --use_freebayes=true
+```
+
+### Output Directory Structure Example
+
+```
+Results/
+│── 1.trim/
+│── 2.index/
+│── 3.sam/
+│── ...
+│── 9.final/          # Final SV dataset after filtering
+│── 10.bcftools_final.snp/  # Final filtered SNP dataset
+```
 
 ---
 
-## Script
+## 📊 Example Execution
 
-All bash and python script will upload in `script` documentary.
+![Execution Example](./docs/figure2.3.png)
 
-## Note
+Detailed visualizations of inputs, outputs, and intermediate results are provided in `docs/`.
 
-This pipeline was tested in a group workstation, please check the enviroment before use.
-Contact: [jiaozexin@outlook.com](jiaozexin@outlook.com)
+---
+
+## 🔧 Configuration
+
+Customize `nextflow.config` to define:
+
+* Input files (e.g., FASTQ, reference genome, GFF3)
+* Software paths or versions
+* Resource allocations
+* Optional modules via Boolean parameters (e.g., `use_delly`, `use_gwas`)
+
+Example:
+
+```bash
+params {
+  use_delly = true
+  use_sv_visualize = true
+  use_gwas = true
+}
+```
+
+---
+
+## 📖 Documentation
+
+### Core Modules
+
+* **Main.nf**: Preprocessing, alignment, variant calling.
+* **SV\_genotyping\_smoove.nf**: Joint genotyping of SVs using Smoove + SVtyper.
+* **SV\_bioinformatic\_filtering\_smoove.nf**: Depth-based and bioinformatic SV filtering using Duphold, Bedtools.
+* **SNP\_filtering\_from\_bcftools.nf**: SNP VCF merging + VCFtools filtering.
+* **Optional.nf**: SV visualization (Samplot), annotation (SnpEff, ANNOVAR), overlap analysis, GO/KEGG enrichment, GWAS (PLINK+GCTA), imputation (FImpute3).
+
+For detailed descriptions and citations, refer to the **Methods** section of our \[associated manuscript (if public)].
+
+---
+
+## 🖼 Visual Guides
+
+* **Figure 2.1**: Schematic overview of SV/SNP analysis workflow
+* **Figure 2.2**: Nextflow pipeline architecture
+* **Figures 2.3-2.4**: Execution examples per module
+* **Figure 2.5**: SV quality improvements post-filtering
+
+All figures are provided in the `/docs/` folder.
+
+
+---
+
+## 🛠 Future Work
+
+* Additional support for long-read data integration
+* Full workflow containerization for cloud-native execution
+* Dynamic parameterization for species-specific defaults
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please open issues or pull requests for bug fixes, improvements, or new feature suggestions.
+
+---
+
+## 📬 Contact
+
+For questions, collaborations, or feedback:
+**Contact**: \[[jiaozexin@outlook.com](mailto:jiaozexin@outlook.com)]
+**Lead Developer**: Jiao Zexin
+
+---
+
+> *If you use this pipeline in your research, please cite our associated publication (coming soon) and acknowledge this repository.*
+
+---
+
+Let me know if you want me to generate the **figures in markdown preview format**, **add license details**, or help with the **CITATION file**!
